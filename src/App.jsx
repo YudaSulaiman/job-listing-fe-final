@@ -29,6 +29,7 @@ const App = () => {
     if (!filterList.includes(filter)) {
       setFilterList([...filterList, filter]);
     }
+    setCurrentPage(1);
   }
 
   function resetFilter() {
