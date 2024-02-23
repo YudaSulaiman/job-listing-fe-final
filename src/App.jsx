@@ -1,100 +1,124 @@
-import image1 from '../public/bg-header-desktop.svg'
-import faceit from '../public/faceit.svg'
-
+import { useEffect, useState } from "react";
+import image1 from "../public/bg-header-desktop.svg";
+import JobContainer from "./components/JobContainer";
+import jobList from "./data/data.json";
 
 const App = () => {
-  return (
-    <>
-      <header className="bg-cyan-dark bg-no-repeat bg-cover h-44 bg-header-desktop" style={{background: image1}}></header>
-      <main className="bg-cyan-light min-h-[80vh] pb-8 px-6">
-        <div className="max-w-5xl m-auto relative -top-8 ">
-          <div className="w-full max-w-5xl min-h-[4rem] mb-10">
-          <div className="bg-white rounded-md px-7 py-4 w-full shadow-lg flex justify-between">
-              <ul className="flex flex-wrap gap-4">
-                  <li className="flex">
-                    <label style={{alignSelf: 'center'}}>
-                      This is Filter
-                    </label>
-                    <div>
-                    <button className="bg-cyan-dark h-full flex items-center p-2 rounded-r-md hover:bg-cyan-very-dark">
-                      x
-                    </button>            
+
+  const [filteredItems, setFilteredItems] = useState(jobList);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const totalPages = Math.ceil(jobList.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  const pageButtonStyle = (page) => {
+    return currentPage == page ? 
+      "mx-1 px-6 py-4 rounded shadow text-white bg-cyan-dark font-bold" :
+      "mx-1 px-6 py-4 rounded shadow text-blue-500 bg-white"
+  }
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const [filterList, setFilterList] = useState([]);
+
+  const handleClickFilter = (filter) => {
+    if (!filterList.includes(filter)) {
+      setFilterList([...filterList, filter]);
+    }
+  }
+
+  function resetFilter() {
+    setFilterList([]);
+  }
+
+  function removeFilter(filterToRemove) {
+    const updatedFilterList = filterList.filter(filter => filter !== filterToRemove);
+    setFilterList(updatedFilterList);
+  }
+
+  useEffect(() => {
+    const filtered = jobList.filter(job =>
+      filterList.every(
+        (filter) =>
+          job.role === filter || 
+          job.level === filter || 
+          job.languages.includes(filter)
+        )
+    );
+    setFilteredItems(filtered);
+  }, [filterList])
+
+    return (
+        <>
+            <header
+                className="bg-cyan-dark bg-no-repeat bg-cover h-44 bg-header-desktop"
+                style={{ backgroundImage: `url(${image1})` }}
+            ></header>
+            <main className="bg-cyan-light min-h-[80vh] pb-8 px-6">
+                <div className="max-w-5xl m-auto relative -top-8 ">
+                    <div className="w-full max-w-5xl min-h-[4rem] mb-10">
+                      {filterList.length > 0 && (
+                        <div className="bg-white rounded-md px-7 py-4 w-full shadow-lg flex justify-between">
+                            <ul className="flex flex-wrap gap-4">
+                                {filterList.map((item, index) => (
+                                  <li className="flex">
+                                      <label className="bg-cyan-light-2 px-2 py-1.5 text-sm text-cyan-dark font-bold rounded-l-md cursor-default" style={{ alignSelf: "center" }}>
+                                          {item}
+                                      </label>
+                                      <div>
+                                        <button class="bg-cyan-dark h-full flex items-center p-2 rounded-r-md hover:bg-cyan-very-dark" onClick={() => removeFilter(item)}>
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"><path fill="#FFF" fill-rule="evenodd" d="M11.314 0l2.121 2.121-4.596 4.596 4.596 4.597-2.121 2.121-4.597-4.596-4.596 4.596L0 11.314l4.596-4.597L0 2.121 2.121 0l4.596 4.596L11.314 0z"></path></svg>
+                                        </button>
+                                      </div>
+                                  </li>
+                                ))}
+                            </ul>
+                            <button className="text-sm text-cyan-dark font-bold underline" onClick={resetFilter}>
+                                Clear
+                            </button>
+                        </div>
+                      )}
                     </div>
-                  </li>
-              </ul>
-              <button
-                className="text-sm text-cyan-dark font-bold underline"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-          <div>
-          <ul>
-          <li
-      className={`relative bg-white p-7 rounded-md flex items-center gap-6 shadow-lg mb-12 lg:mb-6`}
-    >
-      <div className="absolute -top-7 w-14 lg:relative lg:w-auto lg:top-0">
-        <img src={faceit} alt={'image'} className="rounded-full w-full" />
-      </div>
-      <div className="w-full lg:flex justify-between items-center">
-        <div>
-          <div>
-            <span className="text-sm text-cyan-dark font-bold">
-              Company
-            </span>
-              <span className="bg-cyan-dark px-2 py-1 rounded-xl ml-2 text-xs text-white font-bold">
-                NEW!
-              </span>
-              <span className="bg-cyan-very-dark px-2 py-1 rounded-xl ml-2 text-xs text-white font-bold">
-                FEATURED
-              </span>
-          </div>
-          <a
-            href="#"
-            className="block my-1 text-base font-bold hover:text-cyan-dark"
-          >
-            Position
-          </a>
-          <ul className="flex text-cyan-dark-grayish gap-4 text-sm font-medium">
-                  <li>Date</li>
-                  <li className="before:content-['•'] before:mr-3 after:content-['•'] after:ml-3">
-                    Contract
-                  </li>
-                  <li>Location</li>
-                </ul>
-              </div>
-              <div>
-                <ul className="flex flex-wrap gap-4 border-t border-cyan-dark-grayish mt-4 pt-4 lg:border-0">
-                    <li>
-                      <button>
-                        <label>Requirement</label>
-                      </button>
-                    </li>
-                </ul>
-              </div>
-            </div>
-          </li>
-          </ul>
-          </div>
-          <nav className="mt-4">
-            <ul className="flex justify-center">
-              
-                  <li>
-                    <button
-                      className={`mx-1 px-6 py-4 rounded shadow 
-                          text-blue-500 bg-white
-                      }`}
-                    >
-                      1
-                    </button>
-                  </li>
-            </ul>
-          </nav>
-        </div>
-      </main>
-    </>
-  );
+                    <div>
+                          {currentItems.map((job, index) => (
+                            <JobContainer
+                              key={index}
+                              logo = {job.logo}
+                              company = {job.company}
+                              isNew = {job.new}
+                              isFeatured = {job.featured}
+                              position = {job.position}
+                              role={job.role}
+                              level={job.level}
+                              postedAt={job.postedAt}
+                              contract={job.contract}
+                              location={job.location}
+                              languages={job.languages}
+                              onClick = {handleClickFilter}
+                            />
+                          ))}
+                        
+                    </div>
+                    <nav className="mt-4">
+                        <ul className="flex justify-center">
+                            {Array.from({ length: totalPages }).map((_, index) => (
+                                <li key={index}>
+                                  <button className={pageButtonStyle(index + 1)}
+                                  onClick={() => paginate(index + 1)}>
+                                      {index + 1}
+                                  </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </div>
+            </main>
+        </>
+    );
 };
 
 export default App;
